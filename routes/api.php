@@ -1,6 +1,11 @@
 <?php
 
 use Illuminate\Http\Request;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\RestaurantOwnerController;
+use App\Http\Controllers\DeliveryController;
+use App\Http\Controllers\AdminController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,6 +19,32 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+// Authentication Routes
+Route::post('register', [AuthController::class, 'register']);
+Route::post('login', [AuthController::class, 'login']);
+
+// Customer Routes
+Route::middleware(['auth:api', 'role:Customer'])->group(function () {
+    Route::get('restaurants', [CustomerController::class, 'browseRestaurants']);
+    Route::post('order', [CustomerController::class, 'placeOrder']);
+    Route::get('order/{id}/track', [CustomerController::class, 'trackOrder']);
+    Route::get('orders/history', [CustomerController::class, 'viewOrderHistory']);
+});
+
+// Restaurant Owner Routes
+Route::middleware(['auth:api', 'role:Restaurant Owner'])->group(function () {
+    Route::post('restaurant/menu', [RestaurantOwnerController::class, 'manageMenus']);
+    Route::get('restaurant/orders', [RestaurantOwnerController::class, 'viewOrders']);
+});
+
+// Delivery Personnel Routes
+Route::middleware(['auth:api', 'role:Delivery Personnel'])->group(function () {
+    Route::get('deliveries', [DeliveryController::class, 'viewAvailableDeliveries']);
+    Route::patch('delivery/{id}/status', [DeliveryController::class, 'updateDeliveryStatus']);
+});
+
+// Administrator Routes
+Route::middleware(['auth:api', 'role:Admin'])->group(function () {
+    Route::get('admin/users', [AdminController::class, 'manageUsers']);
+    Route::get('admin/reports', [AdminController::class, 'generateReports']);
 });
