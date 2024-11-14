@@ -17,13 +17,22 @@ class RoleMiddleware
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
-        // Fetch the role name using the role_id from the roles table
-        $roleName = Role::find(Auth::user()->role_id)->name;
-        //dd($roleName, $role);
+        $user = Auth::user();
+        $roleRecord = Role::find($user->role_id);
+
+        // Check if the role exists in the roles table
+        if (!$roleRecord) {
+            return response()->json(['error' => 'Role not found'], 403);
+        }
+
+        $roleName = $roleRecord->name;
 
         // Match the role name with the provided $role
         if ($roleName != $role) {
-            return response()->json(['error' => 'Unauthorized'], 403);
+            return response()->json([
+                'error' => 'Unauthorized',
+                'message' => "With your current Login Credentials You can only access $role URLs. Your current role is $roleName."
+            ], 403);    
         }
 
         return $next($request);
