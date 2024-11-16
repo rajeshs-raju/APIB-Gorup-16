@@ -13,7 +13,6 @@ class CustomerController extends Controller
 {
     public function browseRestaurants()
     {
-        //dd("ddddd");
         try {
             $restaurants = Restaurant::all();
             return response()->json(['data' => $restaurants], 200);
@@ -22,40 +21,52 @@ class CustomerController extends Controller
         }
     }
 
-    public function placeOrder(Request $request)
+
+public function placeOrder(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'restaurant_id' => 'required|exists:restaurants,id',
-            'items' => 'required|array',
-            'items.*.menu_id' => 'required|exists:menus,id',
-            'items.*.quantity' => 'required|integer|min:1',
+        'restaurant_id' => 'required|exists:restaurants,id',
+        'items' => 'required|array',
+        'items.*.menu_id' => 'required|exists:menus,id',
+        'items.*.quantity' => 'required|integer|min:1',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json(['error' => $validator->errors()], 422);
+    }
+
+    try {
+        $total = 0;
+
+        $order = Order::create([
+            'user_id' => Auth::id(),
+            'restaurant_id' => $request->restaurant_id,
+            'total' => 0, // Initialize to 0, we'll update it after calculating the total
         ]);
 
-        if ($validator->fails()) {
-            return response()->json(['error' => $validator->errors()], 422);
-        }
+    foreach ($request->items as $item) {
+        $menu = Menu::findOrFail($item['menu_id']); // Fetch the menu to get the price
+        $itemTotal = $menu->price * $item['quantity'];
+        $total += $itemTotal;
 
-        try {
-            $order = Order::create([
-                'user_id' => Auth::id(),
-                'restaurant_id' => $request->restaurant_id,
-                'total' => $this->calculateTotal($request->items),
-            ]);
+        OrderItem::create([
+            'order_id' => $order->id,
+            'menu_id' => $item['menu_id'],
+            'quantity' => $item['quantity'],
+            'price' => $menu->price, // Use the price from the database
+        ]);
+    }
 
-            foreach ($request->items as $item) {
-                OrderItem::create([
-                    'order_id' => $order->id,
-                    'menu_id' => $item['menu_id'],
-                    'quantity' => $item['quantity'],
-                    'price' => $item['price'],
-                ]);
-            }
+    // Update the total for the order
+    $order->update(['total' => $total]);
 
-            return response()->json(['message' => 'Order placed successfully', 'order' => $order], 201);
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Failed to place order. Please try again later.'], 500);
+    return response()->json(['message' => 'Order placed successfully', 'order' => $order], 201);
+     } catch (\Exception $e) {
+        \Log::error('Order placement failed: ' . $e->getMessage());
+        return response()->json(['error' => 'Failed to place order. Please try again later.'], 500);
         }
     }
+
 
     public function trackOrder($id)
     {
