@@ -11,16 +11,32 @@ use Illuminate\Support\Facades\Auth;
 
 class CustomerController extends Controller
 {
-    public function browseRestaurants()
-    {
-        //dd("ddddd");
-        try {
-            $restaurants = Restaurant::all();
-            return response()->json(['data' => $restaurants], 200);
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Failed to fetch restaurants.'], 500);
-        }
-    }
+    /*
+    This method lists the available restaurants to customer
+    */
+   public function browseRestaurants()
+   {
+       try {
+           $restaurants = Restaurant::all();
+           if ($restaurants->isEmpty()) {
+               return response()->json([
+                   'message' => 'No restaurants found.',
+                   'data' => []
+               ], 404);
+           }
+           return response()->json([
+               'message' => 'Restaurants retrieved successfully.',
+               'data' => $restaurants
+           ], 200);
+
+       } catch (\Throwable $e) {
+           Log::error('Error fetching restaurants: ' . $e->getMessage());
+           return response()->json([
+               'error' => 'An unexpected error occurred while fetching restaurants.'
+           ], 500);
+       }
+   }
+
 
     public function placeOrder(Request $request)
     {
