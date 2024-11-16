@@ -1,0 +1,8 @@
+# Ignore environment configuration
+.env
+
+# Ignore Composer dependencies folder
+/vendor/
+
+# Ignore database configuration
+/config/database.php
