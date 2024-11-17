@@ -52,6 +52,14 @@ Route::middleware(['auth:api', 'role:Delivery Personnel'])->group(function () {
 
 // Administrator Routes
 Route::middleware(['auth:api', 'role:Admin'])->group(function () {
-    Route::get('admin/users', [AdminController::class, 'manageUsers']);
+    // Manage Users
+    Route::get('/admin/users', [AdminController::class, 'manageUsers']);
+    Route::post('/admin/create_user', [AdminController::class, 'createUser']);
+    Route::put('admin/users/{userId}', [AdminController::class, 'updateUser']);
+    Route::delete('admin/users/{userId}', [AdminController::class, 'deleteUser']);
+    // View and Manage Orders
+    Route::get('admin/orders', [AdminController::class, 'viewOrders']);
+    Route::put('admin/orders/status/{orderId}', [AdminController::class, 'updateOrderStatus']);
+    // Generate Reports
     Route::get('admin/reports', [AdminController::class, 'generateReports']);
 });
