@@ -26,9 +26,9 @@ Route::post('login', [AuthController::class, 'login']);
 // Customer Routes
 Route::middleware(['auth:api', 'role:Customer'])->group(function () {
     Route::get('restaurants', [CustomerController::class, 'browseRestaurants']);
+    Route::get('menus/search', [CustomerController::class, 'searchMenus']);
     Route::post('order', [CustomerController::class, 'placeOrder']);
-    Route::get('order/{id}/track', [CustomerController::class, 'trackOrder']);
-    Route::get('orders/history', [CustomerController::class, 'viewOrderHistory']);
+    Route::get('order/track', [CustomerController::class, 'trackOrder']); //both present order history & order track
 });
 
 // Restaurant Owner Routes
