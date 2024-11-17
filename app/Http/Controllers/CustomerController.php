@@ -131,6 +131,7 @@ class CustomerController extends Controller
 
             return response()->json([
                 'message' => 'Order placed successfully',
+                'user_details' => $user,
                 'order' => $orderWithRestaurantName,
                 'order_items' => $orderItems
             ], 201);
