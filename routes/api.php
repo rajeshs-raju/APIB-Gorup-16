@@ -33,8 +33,13 @@ Route::middleware(['auth:api', 'role:Customer'])->group(function () {
 
 // Restaurant Owner Routes
 Route::middleware(['auth:api', 'role:Restaurant Owner'])->group(function () {
+    Route::post('restaurant/create', [RestaurantOwnerController::class, 'createRestaurant']);
     Route::post('restaurant/menu', [RestaurantOwnerController::class, 'manageMenus']);
+    Route::put('restaurant/menu/{id}', [RestaurantOwnerController::class, 'updateMenuItem']);
+    Route::delete('restaurant/menu/delete/{id}', [RestaurantOwnerController::class, 'deleteMenu']);
     Route::get('restaurant/orders', [RestaurantOwnerController::class, 'viewOrders']);
+    Route::put('restaurant/orders/{id}/status', [RestaurantOwnerController::class, 'updateOrderStatus']);
+    Route::put('restaurant/update_details', [RestaurantOwnerController::class, 'updateRestaurantDetails']);
 });
 
 // Delivery Personnel Routes

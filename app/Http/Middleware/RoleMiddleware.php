@@ -31,7 +31,7 @@ class RoleMiddleware
         if ($roleName != $role) {
             return response()->json([
                 'error' => 'Unauthorized',
-                'message' => "With your current Login Credentials You can only access $role URLs. Your current role is $roleName."
+                'message' => "With your current Login Credentials You can't access $role URLs. as Your current role is $roleName."
             ], 403);    
         }
 

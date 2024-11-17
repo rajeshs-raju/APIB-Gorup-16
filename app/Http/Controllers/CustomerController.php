@@ -109,7 +109,7 @@ class CustomerController extends Controller
             $order = Order::create([
                 'user_id' => $user->id,
                 'restaurant_id' => $request->restaurant_id,
-                'status' => 'accepted',
+                'status' => 'pending',
                 'total' => $total,
                 'shipping_address' => $request->shipping_address,
                 'payment_method' => $request->payment_method,
