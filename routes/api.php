@@ -45,7 +45,9 @@ Route::middleware(['auth:api', 'role:Restaurant Owner'])->group(function () {
 // Delivery Personnel Routes
 Route::middleware(['auth:api', 'role:Delivery Personnel'])->group(function () {
     Route::get('deliveries', [DeliveryController::class, 'viewAvailableDeliveries']);
-    Route::patch('delivery/{id}/status', [DeliveryController::class, 'updateDeliveryStatus']);
+    Route::post('delivery/accept/{order_id}', [DeliveryController::class, 'acceptOrder']);
+    Route::patch('delivery/update_del_status', [DeliveryController::class, 'updateDeliveryStatus']);
+    //Route::post('delivery/availability', [DeliveryController::class, 'setAvailability']);
 });
 
 // Administrator Routes
